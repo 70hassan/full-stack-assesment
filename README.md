@@ -109,10 +109,14 @@ Interpretations where the brief leaves room:
 
 ## Deploying
 
-The Dockerfile builds the React app and serves it together with the API from one container
-(WhiteNoise + gunicorn). `render.yaml` is a Render blueprint for it: create a new Blueprint from the
-repository and it deploys with no further settings. Any host that runs a Dockerfile works the same
-way; set `DJANGO_SECRET_KEY` and `DJANGO_DEBUG=0`.
+**Vercel (used for the hosted demo).** Two projects from this repository: one with Root Directory
+`backend` (detected as Django) and one with Root Directory `frontend` (detected as Vite).
+`frontend/vercel.json` forwards `/api/*` to the backend project, so the browser talks to a single
+origin; change the destination there if the backend URL differs.
+
+**Docker (any container host).** The Dockerfile builds the React app and serves it together with
+the API from one container (WhiteNoise + gunicorn). `render.yaml` is a Render blueprint for it. Set
+`DJANGO_SECRET_KEY` and `DJANGO_DEBUG=0`.
 
 ## Services used
 
