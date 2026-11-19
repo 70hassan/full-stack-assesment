@@ -7,7 +7,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 FRONTEND_DIST = BASE_DIR.parent / "frontend" / "dist"
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-only-insecure-key-change-me")
-DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
+# Debug is on for local development and off by default on a hosting platform.
+DEBUG = os.environ.get("DJANGO_DEBUG", "0" if os.environ.get("VERCEL") else "1") == "1"
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "*").split(",")
 CSRF_TRUSTED_ORIGINS = [o for o in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if o]
 
@@ -25,6 +26,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "config.urls"
+APPEND_SLASH = False
 WSGI_APPLICATION = "config.wsgi.application"
 
 TEMPLATES = [
@@ -45,9 +47,11 @@ USE_TZ = True
 
 # In production Django also serves the Vite build (frontend/dist) through
 # WhiteNoise: hashed files under /assets/ plus index.html for every other path.
+# When the build is absent (API-only deployments) there is nothing to serve.
 STATIC_URL = "/assets/"
-STATIC_ROOT = FRONTEND_DIST / "assets"
-WHITENOISE_ROOT = FRONTEND_DIST if FRONTEND_DIST.exists() else None
+if FRONTEND_DIST.exists():
+    STATIC_ROOT = FRONTEND_DIST / "assets"
+    WHITENOISE_ROOT = FRONTEND_DIST
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
 CACHES = {
