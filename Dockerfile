@@ -5,7 +5,9 @@ WORKDIR /app/frontend
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci --no-audit --no-fund
 COPY frontend/ ./
-RUN npm run build
+RUN npm run build \
+    # Pre-compress the bundle; WhiteNoise serves the .gz copies automatically.
+    && find dist -type f \( -name '*.js' -o -name '*.css' -o -name '*.html' \) -exec gzip -k9 {} \;
 
 FROM python:3.13-slim
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 DJANGO_DEBUG=0
